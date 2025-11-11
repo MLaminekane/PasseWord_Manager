@@ -26,7 +26,7 @@ password-manager/
 
 ### 1️⃣ Cloner le projet
 ```bash
-git clone https://github.com/SMoctarL/password-manager.git
+https://github.com/SMoctarL/PasseWord_Manager.git
 cd password-manager/src
 ```
 
