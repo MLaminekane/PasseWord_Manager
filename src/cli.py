@@ -2,7 +2,7 @@ import argparse
 import getpass
 import sys
 from datetime import datetime
-from database import init_db, register_user, verify_user, add_password, get_password
+from database import init_db, register_user, verify_user, add_password, get_password, delete_password
 
 class Colors:
     RED = '\033[91m'
@@ -57,10 +57,14 @@ def print_usage():
 {Colors.CYAN}Afficher le mot de passe associé à un label quelconque:{Colors.END}
   {Colors.WHITE}python main.py -u {Colors.BOLD}username{Colors.END} -s {Colors.BOLD}label{Colors.END}
 
+{Colors.CYAN}Supprimer un mot de passe:{Colors.END}
+  {Colors.WHITE}python main.py -u {Colors.BOLD}username{Colors.END} -d {Colors.BOLD}label{Colors.END}
+
 {Colors.CYAN}Exemples:{Colors.END}
   {Colors.WHITE}python main.py -r john{Colors.END}
   {Colors.WHITE}python main.py -u john -a email MonSuperPass123{Colors.END}
   {Colors.WHITE}python main.py -u john -s email{Colors.END}
+  {Colors.WHITE}python main.py -u john -d email{Colors.END}
 """
     print(usage)
 
@@ -74,6 +78,7 @@ def main():
     parser.add_argument('-u', '--user', metavar='USERNAME', help="Nom d'utilisateur pour les opérations")
     parser.add_argument('-a', '--add', nargs=2, metavar=('LABEL', 'PASSWORD'), help='Ajouter un mot de passe: -a label mot_de_passe')
     parser.add_argument('-s', '--show', metavar='LABEL', help='Afficher un mot de passe: -s label')
+    parser.add_argument('-d', '--delete', metavar='LABEL', help='Supprimer un mot de passe: -d label')
     parser.add_argument('-h', '--help', action='store_true', help="Afficher ce message d'aide")
     
     args = parser.parse_args()
@@ -123,6 +128,22 @@ def main():
             password = get_password(args.user, args.show, master_password)
             if password:
                 print_password(args.show, password)
+            else:
+                print_error("Erreur: Aucun mot de passe trouvé pour ce label!")
+        else:
+            print_error("Erreur: Master password invalide ou utilisateur non trouvé!")
+    
+    # Suppression de mot de passe
+    elif args.user and args.delete:
+        print(f"\n{Colors.CYAN}{Colors.BOLD}🗑️  SUPPRESSION DE MOT DE PASSE{Colors.END}")
+        print(f"{Colors.WHITE}Utilisateur: {Colors.BOLD}{args.user}{Colors.END}")
+        print(f"{Colors.WHITE}Label: {Colors.BOLD}{args.delete}{Colors.END}")
+        
+        master_password = getpass.getpass(f'{Colors.YELLOW}🔒 Entrez le master password pour {args.user}: {Colors.END}')
+        
+        if verify_user(args.user, master_password):
+            if delete_password(args.user, args.delete):
+                print_success(f"Mot de passe '{args.delete}' supprimé avec succès!")
             else:
                 print_error("Erreur: Aucun mot de passe trouvé pour ce label!")
         else:

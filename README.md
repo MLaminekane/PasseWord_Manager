@@ -67,6 +67,11 @@ python main.py -u <USERNAME> -a <LABEL> <PASSWORD>
 python main.py -u <USERNAME> -s <LABEL>
 ```
 
+### 🗑️ Supprimer un mot de passe
+```bash
+python main.py -u <USERNAME> -d <LABEL>
+```
+
 ---
 
 ## 🧠 Fonctionnement interne

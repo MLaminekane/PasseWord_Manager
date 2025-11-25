@@ -129,3 +129,29 @@ def get_password(username, label, master_password):
     aes_key = derive_aes_key(master_password, encryption_salt)
     
     return decrypt_password(encrypted_password, aes_key)
+
+def delete_password(username, label):
+    """Supprime un mot de passe pour un utilisateur donné."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Récupérer le user_id
+    cursor.execute('SELECT id FROM users WHERE username = ?', (username,))
+    user = cursor.fetchone()
+    if not user:
+        conn.close()
+        return False
+    
+    user_id = user[0]
+    
+    # Supprimer le mot de passe
+    cursor.execute(
+        'DELETE FROM passwords WHERE user_id = ? AND label = ?',
+        (user_id, label)
+    )
+    
+    deleted = cursor.rowcount > 0
+    conn.commit()
+    conn.close()
+    
+    return deleted
